@@ -5,7 +5,7 @@ items:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: kylie-fan-club
+      app: httpd-vergie
       app.kubernetes.io/component: httpd-vergie
       app.kubernetes.io/instance: httpd-vergie
     name: httpd-vergie
