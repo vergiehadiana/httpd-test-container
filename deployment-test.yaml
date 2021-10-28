@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: kylie-fan-club
+      app.kubernetes.io/component: httpd-vergie
+      app.kubernetes.io/instance: httpd-vergie
+    name: httpd-vergie
+  spec:
+    replicas: 3
+    revisionHistoryLimit: 10
+    selector:
+      deploymentconfig: httpd-vergie
+    template:
+      metadata:
+        labels:
+          deploymentconfig: httpd-vergie
+      spec:
+        containers:
+        - image: httpd-vergie
+          imagePullPolicy: Always
+          name: httpd-vergie
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - httpd-vergie
+        from:
+          kind: ImageStreamTag
+          name: httpd-vergie:test
+      type: ImageChange
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: httpd-vergie
+      app.kubernetes.io/component: httpd-vergie
+      app.kubernetes.io/instance: httpd-vergie
+    name: httpd-vergie
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    labels:
+      app: httpd-vergie
+      app.kubernetes.io/component: httpd-vergie
+      app.kubernetes.io/instance: httpd-vergie
+    name: httpd-vergie
+  spec:
+    port:
+      targetPort: 8080-tcp
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: httpd-vergie
+      weight: 100
+    wildcardPolicy: None
